@@ -72,6 +72,11 @@ class CIn:
     def getint(self):
         '''Return an integer from the input stream.'''
 
+        sign = self.getc()
+        if sign not in {'-', '+'}:
+           self.ungetc(sign)
+           sign = ''
+           
         word = self.getword()
 
         num = ''
@@ -83,7 +88,7 @@ class CIn:
 
         if num:
             self.ungetc(word)
-            return int(num)
+            return int(sign + num)
         else:
             raise CInException('Integer expected, got ' + word)
 
