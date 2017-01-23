@@ -91,11 +91,12 @@ class CIn:
         '''Return a float from the input stream.'''
 
         pre_dot_num = str(self.getint())
-        dot = self.getc()
-        if dot != '.':
-            self.ungetc(dot)
-            return float(pre_dot_num)
-        post_dot_num = str(self.getint())
+
+        dot = ''
+        post_dot_num = ''
+        if self.peek() == '.':
+            dot = self.getc()
+            post_dot_num = str(self.getint())
 
         return float(pre_dot_num + dot + post_dot_num)
 
@@ -111,6 +112,11 @@ class CIn:
         copy = self.buffer[:]
         self.buffer = []
         return copy
+
+    def peek(self):
+        '''Return the next character in the buffer or None.'''
+
+        return None if len(self.buffer) == 0 else self.buffer[0][0]
 
 class CInException(Exception):
     '''Exception raised when something goes wrong.'''
