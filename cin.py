@@ -44,9 +44,6 @@ class CIn:
         char can be a multibyte string but things can get messed up if char
         contains any whitespace character.'''
 
-        if not chars:
-            return
-
         if len(self.buffer):
             self.buffer = chars + self.buffer
 
@@ -91,18 +88,18 @@ class CIn:
         pre_dot_num = str(self.getint())
 
         dot = ''
+        post_dot_num = ''
         if self.peek() == '.':
             dot = self.getc()
 
-        post_dot_digit = self.getc()
-        if ord(post_dot_digit) not in range(ord('0'), ord('9') + 1):
-            raise CInException('Integer expected, got ' + post_dot_digit)
-
-        post_dot_num = ''
-        while post_dot_digit.isdigit() and post_dot_digit not in {' ', '\t', '\n'}:
-            post_dot_num += post_dot_digit
             post_dot_digit = self.getc()
-        self.ungetc(post_dot_digit)
+            if ord(post_dot_digit) not in range(ord('0'), ord('9') + 1):
+                raise CInException('Integer expected, got ' + post_dot_digit)
+
+            while post_dot_digit.isdigit() and post_dot_digit not in {' ', '\t', '\n'}:
+                post_dot_num += post_dot_digit
+                post_dot_digit = self.getc()
+            self.ungetc(post_dot_digit)
 
         return float(pre_dot_num + dot + post_dot_num)
 
@@ -124,6 +121,12 @@ class CIn:
 
         return None if len(self.buffer) == 0 else self.buffer[0]
 
+    def skip_whitespace(self):
+        '''Remove whitespace from the start of the buffer.'''
+
+        self.fill_buffer()
+        self.buffer = self.buffer.lstrip()
+
 class CInException(Exception):
     '''Exception raised when something goes wrong.'''
 
@@ -132,3 +135,4 @@ class CInException(Exception):
 
 
 cinput = CIn()
+
