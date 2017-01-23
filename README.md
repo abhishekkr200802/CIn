@@ -11,31 +11,4 @@ Just copy/move the cin.py file to a place from where you can import it.
 ## Usage
 
 Import cinput from cin and call the methods you want to use. In case of an error, CInException is raised. Simple!
-Below is me playing with cinput:
-
-```python
->>> from cin import cinput
->>> cinput.getc()
-Kill 'em with success, bury 'em with a smile.
-'K'
->>> cinput.ungetc('K')
->>> cinput.getc()
-'K'
->>> cinput.getc()
-'i'
->>> cinput.getc()
-'l'
->>> cinput.getc()
-'l'
->>> cinput.empty_buffer()
-["'em", 'with', 'success,', 'bury', "'em", 'with', 'a', 'smile.']
->>> cinput.getint()
-123
-123
->>> cinput.getfloat()
-43.23
-43.23
->>> cinput.getfloat()
-73492739
-73492739.0
-```
+You can find an example program written in Python using CIn here: https://github.com/abhishekkr200802/evalisp
