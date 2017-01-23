@@ -37,6 +37,5 @@ Kill 'em with success, bury 'em with a smile.
 43.23
 >>> cinput.getfloat()
 73492739
-.0
 73492739.0
 ```
