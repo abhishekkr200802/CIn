@@ -26,71 +26,64 @@ class CIn:
     '''Implements methods that can be used for buffered input.'''
 
     def __init__(self):
-        self.buffer = []
+        self.buffer = ''
 
     def getc(self):
         '''Read and return a single non-whitespace byte.'''
 
         self.fill_buffer()
 
-        word = self.buffer[0]
-        byte = word[0]
-        if word[1:]:
-            self.buffer[0] = word[1:]
-        else:
-            self.buffer.pop(0)
+        byte = self.buffer[0]
+        self.buffer = self.buffer[1:]
 
         return byte
 
-    def ungetc(self, char):
+    def ungetc(self, chars):
         '''Put the single byte char back into the buffer.
 
         char can be a multibyte string but things can get messed up if char
         contains any whitespace character.'''
 
-        if not char:
+        if not chars:
             return
 
-        if ' ' in char or '\t' in char or '\n' in char:
-            raise CInException(char + 'not ungetable.')
-
         if len(self.buffer):
-            self.buffer[0] = char + self.buffer[0]
-        else:
-            self.buffer.append(char)
+            self.buffer = chars + self.buffer
 
     def getword(self):
         '''Return a single word from the input stream.'''
 
         self.fill_buffer()
 
-        word = self.buffer[0]
-        self.buffer.pop(0)
+        word = self.buffer.split()[0]
+        self.buffer = self.buffer[len(word):].lstrip()
 
         return word
 
     def getint(self):
         '''Return an integer from the input stream.'''
 
-        sign = self.getc()
+        # skip whitespace
+        char = ' '
+        while char in {' ', '\t', '\n'}:
+            char = self.getc()
+
+        sign = char
         if sign not in {'-', '+'}:
-           self.ungetc(sign)
-           sign = ''
-           
-        word = self.getword()
+            self.ungetc(sign)
+            sign = ''
+
+        digit = self.getc()
+        if ord(digit) not in range(ord('0'), ord('9') + 1):
+            raise CInException('Integer expected, got ' + digit)
 
         num = ''
-        for char in word:
-            if not char.isdigit():
-                break
-            word = word[1:]
-            num += char
+        while digit.isdigit() and digit not in {' ', '\t', '\n'}:
+            num += digit
+            digit = self.getc()
+        self.ungetc(digit)
 
-        if num:
-            self.ungetc(word)
-            return int(sign + num)
-        else:
-            raise CInException('Integer expected, got ' + word)
+        return int(num)
 
     def getfloat(self):
         '''Return a float from the input stream.'''
@@ -98,10 +91,18 @@ class CIn:
         pre_dot_num = str(self.getint())
 
         dot = ''
-        post_dot_num = ''
         if self.peek() == '.':
             dot = self.getc()
-            post_dot_num = str(self.getint())
+
+        post_dot_digit = self.getc()
+        if ord(post_dot_digit) not in range(ord('0'), ord('9') + 1):
+            raise CInException('Integer expected, got ' + post_dot_digit)
+
+        post_dot_num = ''
+        while post_dot_digit.isdigit() and post_dot_digit not in {' ', '\t', '\n'}:
+            post_dot_num += post_dot_digit
+            post_dot_digit = self.getc()
+        self.ungetc(post_dot_digit)
 
         return float(pre_dot_num + dot + post_dot_num)
 
@@ -109,19 +110,19 @@ class CIn:
         '''Fill the buffer if empty.'''
 
         if not self.buffer:
-            self.buffer = input().split()
+            self.buffer = input() + '\n'
 
     def empty_buffer(self):
         '''Fill before you empty!!!'''
 
-        copy = self.buffer[:]
-        self.buffer = []
+        copy = self.buffer
+        self.buffer = ''
         return copy
 
     def peek(self):
         '''Return the next character in the buffer or None.'''
 
-        return None if len(self.buffer) == 0 else self.buffer[0][0]
+        return None if len(self.buffer) == 0 else self.buffer[0]
 
 class CInException(Exception):
     '''Exception raised when something goes wrong.'''
